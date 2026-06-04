@@ -24,18 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (id === 'home')    renderHome();
     if (id === 'history') renderHistory();
     if (id === 'stats')   renderStats();
+    if (id === 'garden')  renderGarden();
   }
 
   navBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const target = btn.dataset.screen;
-      // Don't navigate away mid-workout without confirmation
-      if (target === 'workout') {
-        startNextWorkout();
-      } else {
-        showScreen(target);
-      }
-    });
+    btn.addEventListener('click', () => showScreen(btn.dataset.screen));
   });
 
   // ── HOME screen ──────────────────────────────────────────────────────────
@@ -190,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function saveAndFinish(totalSec, distanceKm) {
     const progress = Storage.getProgress();
+    Garden.onWorkoutComplete(progress.weekIndex);
     const runTime  = Workout.getIntervals()
       .filter(i => i.type === 'run')
       .reduce((s, i) => s + i.duration, 0);
@@ -283,6 +277,14 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="breakdown-km">${data.km.toFixed(2)} km</span>`;
       breakdownEl.appendChild(row);
     });
+  }
+
+  // ── GARDEN screen ────────────────────────────────────────────────────────
+  function renderGarden() {
+    const { headline, sub } = Garden.getStatusText();
+    document.getElementById('garden-headline').textContent = headline;
+    document.getElementById('garden-sub').textContent      = sub;
+    Garden.render('garden-scene');
   }
 
   // ── Utilities ─────────────────────────────────────────────────────────────

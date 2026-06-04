@@ -421,5 +421,31 @@ html, body {
 .empty-icon { font-size: 40px; margin-bottom: 12px; }
 .empty-text { font-size: 14px; line-height: 1.6; }
 
+/* ── Garden screen ───────────────────────────────── */
+.garden-content { padding: 8px 0 16px; display: flex; flex-direction: column; }
+
+.garden-status-card {
+  margin: 0 16px 12px;
+  padding: 18px 20px;
+  background: var(--surface);
+  border-radius: 16px;
+  text-align: center;
+}
+.garden-headline { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+.garden-sub      { font-size: 13px; color: var(--text-muted); line-height: 1.5; }
+
+.garden-scene {
+  margin: 0 16px 12px;
+  height: 260px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #0a0e1a;
+}
+
+.garden-legend { margin-top: 0; }
+.legend-rows   { display: flex; flex-direction: column; gap: 10px; }
+.legend-row    { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); }
+.legend-dot    { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
 /* ── Utilities ───────────────────────────────────── */
 .hidden { display: none !important; }

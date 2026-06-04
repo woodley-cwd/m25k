@@ -154,6 +154,31 @@
   </section>
 
   <!-- ══════════════════════════════════════
+       SCREEN: Garden
+  ══════════════════════════════════════ -->
+  <section id="screen-garden" class="screen">
+    <header class="screen-header">
+      <h2 class="screen-title">Garden</h2>
+    </header>
+    <div class="garden-content">
+      <div class="garden-status-card">
+        <div class="garden-headline" id="garden-headline">Your garden awaits</div>
+        <div class="garden-sub"      id="garden-sub">Complete a workout to plant your first flower.</div>
+      </div>
+      <div class="garden-scene" id="garden-scene"></div>
+      <div class="card garden-legend">
+        <div class="card-heading">How it works</div>
+        <div class="legend-rows">
+          <div class="legend-row"><span class="legend-dot" style="background:#66BB6A"></span>Flower planted after each workout</div>
+          <div class="legend-row"><span class="legend-dot" style="background:#FFD700"></span>Blooms fully after 3 days of growth</div>
+          <div class="legend-row"><span class="legend-dot" style="background:#FF6B9D"></span>Flowers wilt if you miss 3+ days</div>
+          <div class="legend-row"><span class="legend-dot" style="background:#A78BFA"></span>Run again to stop the wilting</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
        BOTTOM NAVIGATION
   ══════════════════════════════════════ -->
   <nav class="bottom-nav" id="bottom-nav">
@@ -161,9 +186,9 @@
       <span class="nav-icon">🏠</span>
       <span class="nav-label">Home</span>
     </button>
-    <button class="nav-btn" data-screen="workout">
-      <span class="nav-icon">▶</span>
-      <span class="nav-label">Workout</span>
+    <button class="nav-btn" data-screen="garden">
+      <span class="nav-icon">🌸</span>
+      <span class="nav-label">Garden</span>
     </button>
     <button class="nav-btn" data-screen="history">
       <span class="nav-icon">📋</span>
@@ -178,6 +203,7 @@
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="js/program.js"></script>
+  <script src="js/garden.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/speech.js"></script>
   <script src="js/map.js"></script>
