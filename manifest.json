@@ -1,0 +1,13 @@
+{
+  "name": "M25K — Couch to 5K",
+  "short_name": "M25K",
+  "description": "Your personal Couch to 5K running coach",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1A1A1A",
+  "theme_color": "#00C853",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#00C853" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="M25K" />
+  <title>M25K — Couch to 5K</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon.svg" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <!-- ══════════════════════════════════════
+       SCREEN: Home / Dashboard
+  ══════════════════════════════════════ -->
+  <section id="screen-home" class="screen active">
+    <header class="screen-header">
+      <h1 class="app-title">M25K</h1>
+      <span class="streak-badge" id="home-streak">🔥 0</span>
+    </header>
+
+    <div class="home-content">
+      <!-- Overall progress -->
+      <div class="card progress-card">
+        <div class="progress-label">
+          <span>Overall Progress</span>
+          <span id="home-progress-text">0 / 24</span>
+        </div>
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill" id="home-progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- Next workout -->
+      <div class="card next-workout-card" id="home-next-card">
+        <div class="next-label">UP NEXT</div>
+        <div class="next-title" id="home-next-title">Week 1 · Day 1</div>
+        <div class="next-desc" id="home-next-desc">8 run intervals · 30 min</div>
+        <button class="btn-primary btn-start-workout" id="home-start-btn">
+          Start Workout
+        </button>
+      </div>
+
+      <!-- Finished all workouts state -->
+      <div class="card complete-card hidden" id="home-complete-card">
+        <div class="complete-icon">🏅</div>
+        <div class="complete-title">Programme Complete!</div>
+        <div class="complete-sub">You ran 5K. You did it.</div>
+        <button class="btn-secondary" id="home-reset-btn">Reset Programme</button>
+      </div>
+
+      <!-- Week grid -->
+      <div class="card week-grid-card">
+        <div class="card-heading">Programme</div>
+        <div class="week-grid" id="home-week-grid"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SCREEN: Workout
+  ══════════════════════════════════════ -->
+  <section id="screen-workout" class="screen">
+    <header class="screen-header workout-header">
+      <button class="btn-icon" id="workout-back-btn" aria-label="Back">&#8592;</button>
+      <div class="workout-header-title" id="workout-title">Week 1 · Day 1</div>
+      <div class="workout-header-spacer"></div>
+    </header>
+
+    <div class="workout-content">
+      <!-- Interval indicator -->
+      <div class="interval-strip" id="workout-interval-strip"></div>
+
+      <!-- Phase display -->
+      <div class="phase-block">
+        <div class="phase-label" id="workout-phase-label">GET READY</div>
+        <div class="phase-timer" id="workout-phase-timer">0:00</div>
+        <div class="phase-next" id="workout-phase-next"></div>
+      </div>
+
+      <!-- Overall timer -->
+      <div class="overall-timer" id="workout-overall-timer">0:00</div>
+
+      <!-- Map (hidden if GPS unavailable) -->
+      <div class="map-container" id="map-container">
+        <div id="map"></div>
+      </div>
+
+      <!-- Controls -->
+      <div class="workout-controls">
+        <button class="btn-control btn-pause" id="workout-pause-btn">Pause</button>
+        <button class="btn-control btn-stop"  id="workout-stop-btn">End</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SCREEN: History
+  ══════════════════════════════════════ -->
+  <section id="screen-history" class="screen">
+    <header class="screen-header">
+      <h2 class="screen-title">History</h2>
+    </header>
+    <div class="history-content">
+      <div id="history-list" class="history-list"></div>
+      <div id="history-empty" class="empty-state hidden">
+        <div class="empty-icon">📋</div>
+        <div class="empty-text">No workouts yet.<br/>Complete your first session to see it here.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       SCREEN: Stats
+  ══════════════════════════════════════ -->
+  <section id="screen-stats" class="screen">
+    <header class="screen-header">
+      <h2 class="screen-title">Stats</h2>
+    </header>
+    <div class="stats-content">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-workouts">0</div>
+          <div class="stat-label">Workouts</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-distance">0.0</div>
+          <div class="stat-label">km Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-time">0</div>
+          <div class="stat-label">Min Active</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-calories">0</div>
+          <div class="stat-label">Cal Burned</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-heading">Run Distance Breakdown</div>
+        <div id="stats-weekly-breakdown" class="weekly-breakdown"></div>
+        <div id="stats-empty" class="empty-state hidden">
+          <div class="empty-icon">📊</div>
+          <div class="empty-text">Complete workouts to see your stats.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════════
+       BOTTOM NAVIGATION
+  ══════════════════════════════════════ -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="nav-btn active" data-screen="home">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-btn" data-screen="workout">
+      <span class="nav-icon">▶</span>
+      <span class="nav-label">Workout</span>
+    </button>
+    <button class="nav-btn" data-screen="history">
+      <span class="nav-icon">📋</span>
+      <span class="nav-label">History</span>
+    </button>
+    <button class="nav-btn" data-screen="stats">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Stats</span>
+    </button>
+  </nav>
+
+  <!-- Scripts -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/program.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/speech.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/workout.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
