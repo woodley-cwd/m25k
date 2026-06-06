@@ -115,9 +115,60 @@ const Garden = (() => {
     container.appendChild(svg);
   }
 
+  // ── Time-of-day sky themes ───────────────────────────────────────────────
+  function getSkyTheme() {
+    const h = new Date().getHours(); // 0–23
+    if (h >= 6 && h < 12) {
+      // Morning — bright blue sky, soft golden sun
+      return {
+        name: 'morning',
+        skyTop: '#87CEEB', skyBot: '#B0E0FF',
+        grassTop: '#3a7a20', grassBot: '#234d10',
+        grassBlade: '#4a9028',
+        stars: false, moon: false,
+        sun: { x: 0.25, y: 0.18, r: 22, color: '#FFD54F', glow: '#FFE082' },
+        clouds: true,
+      };
+    } else if (h >= 12 && h < 17) {
+      // Afternoon — deep blue sky, bright white sun high up
+      return {
+        name: 'afternoon',
+        skyTop: '#4A90D9', skyBot: '#87CEEB',
+        grassTop: '#3d8022', grassBot: '#254d12',
+        grassBlade: '#52a030',
+        stars: false, moon: false,
+        sun: { x: 0.55, y: 0.10, r: 26, color: '#FFF176', glow: '#FFEE58' },
+        clouds: true,
+      };
+    } else if (h >= 17 && h < 21) {
+      // Evening — warm sunset oranges and purples
+      return {
+        name: 'evening',
+        skyTop: '#1a0533', skyBot: '#FF6F3C',
+        grassTop: '#2d5a1b', grassBot: '#1a3a0e',
+        grassBlade: '#3a7024',
+        stars: false, moon: false,
+        sun: { x: 0.82, y: 0.72, r: 28, color: '#FF8F00', glow: '#FFCC02' },
+        clouds: false,
+        horizon: { color1: '#FF6F3C', color2: '#FF9800', color3: '#FFC107' },
+      };
+    } else {
+      // Night — dark sky, moon, stars
+      return {
+        name: 'night',
+        skyTop: '#0a0e1a', skyBot: '#1a1a2e',
+        grassTop: '#1e3d12', grassBot: '#111f09',
+        grassBlade: '#2a5018',
+        stars: true, moon: true,
+        sun: null,
+        clouds: false,
+      };
+    }
+  }
+
   function createSVG(W, H, flowers) {
-    const ns  = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg');
+    const ns    = 'http://www.w3.org/2000/svg';
+    const svg   = document.createElementNS(ns, 'svg');
     svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
     svg.setAttribute('xmlns', ns);
     svg.style.width  = '100%';
@@ -125,37 +176,72 @@ const Garden = (() => {
 
     const soilY = H * 0.78;
     const skyH  = soilY;
+    const theme = getSkyTheme();
 
-    // ── Sky ──────────────────────────────────────────────────────────────
+    // ── Sky gradient ─────────────────────────────────────────────────────
     const skyGrad = makeDef(svg, 'linearGradient', { id: 'skyGrad', x1: 0, y1: 0, x2: 0, y2: 1 });
-    addStop(skyGrad, '0%',   '#0a0e1a');
-    addStop(skyGrad, '100%', '#1a1a2e');
+    addStop(skyGrad, '0%',   theme.skyTop);
+    addStop(skyGrad, '100%', theme.skyBot);
     rect(svg, 0, 0, W, skyH, 'url(#skyGrad)');
 
-    // ── Stars ────────────────────────────────────────────────────────────
-    const starSeeds = [13, 37, 71, 97, 131, 157, 191, 223, 251, 277, 307, 331];
-    starSeeds.forEach((s, i) => {
-      const sx = ((s * 73 + i * 41) % W);
-      const sy = ((s * 17 + i * 53) % (skyH * 0.75));
-      const r  = (s % 3 === 0) ? 1.5 : 1;
-      circle(svg, sx, sy, r, `rgba(255,255,255,${0.4 + (s % 5) * 0.1})`);
-    });
+    // ── Evening horizon glow ─────────────────────────────────────────────
+    if (theme.horizon) {
+      const hg = makeDef(svg, 'linearGradient', { id: 'horizGrad', x1: 0, y1: 0, x2: 0, y2: 1 });
+      addStop(hg, '0%',   'transparent');
+      addStop(hg, '60%',  theme.horizon.color2 + '99');
+      addStop(hg, '100%', theme.horizon.color1);
+      rect(svg, 0, skyH * 0.4, W, skyH * 0.6, 'url(#horizGrad)');
+    }
 
-    // ── Moon ─────────────────────────────────────────────────────────────
-    circle(svg, W - 44, 36, 18, '#fffde0', { filter: 'drop-shadow(0 0 6px #fffde0)' });
-    circle(svg, W - 36, 30, 14, '#1a1a2e'); // crescent mask
+    // ── Stars (night only) ───────────────────────────────────────────────
+    if (theme.stars) {
+      const starSeeds = [13, 37, 71, 97, 131, 157, 191, 223, 251, 277, 307, 331];
+      starSeeds.forEach((s, i) => {
+        const sx = ((s * 73 + i * 41) % W);
+        const sy = ((s * 17 + i * 53) % (skyH * 0.75));
+        const r  = (s % 3 === 0) ? 1.5 : 1;
+        circle(svg, sx, sy, r, `rgba(255,255,255,${0.4 + (s % 5) * 0.1})`);
+      });
+    }
+
+    // ── Moon (night only) ────────────────────────────────────────────────
+    if (theme.moon) {
+      circle(svg, W - 44, 36, 18, '#fffde0', { filter: 'drop-shadow(0 0 6px #fffde0)' });
+      circle(svg, W - 36, 30, 14, theme.skyTop); // crescent mask
+    }
+
+    // ── Sun ──────────────────────────────────────────────────────────────
+    if (theme.sun) {
+      const sx = theme.sun.x * W;
+      const sy = theme.sun.y * skyH;
+      // Glow halo
+      const glowGrad = makeDef(svg, 'radialGradient', { id: 'sunGlow', cx: '50%', cy: '50%', r: '50%' });
+      addStop(glowGrad, '0%',   theme.sun.glow + 'CC');
+      addStop(glowGrad, '60%',  theme.sun.glow + '44');
+      addStop(glowGrad, '100%', 'transparent');
+      const glowSize = theme.sun.r * 3.5;
+      rect(svg, sx - glowSize, sy - glowSize, glowSize * 2, glowSize * 2, 'url(#sunGlow)');
+      circle(svg, sx, sy, theme.sun.r, theme.sun.color);
+    }
+
+    // ── Clouds (morning / afternoon) ─────────────────────────────────────
+    if (theme.clouds) {
+      drawCloud(svg, W * 0.18, skyH * 0.22, 0.9, ns);
+      drawCloud(svg, W * 0.65, skyH * 0.14, 0.65, ns);
+      drawCloud(svg, W * 0.45, skyH * 0.38, 0.5, ns);
+    }
 
     // ── Grass strip ──────────────────────────────────────────────────────
     const grassGrad = makeDef(svg, 'linearGradient', { id: 'grassGrad', x1: 0, y1: 0, x2: 0, y2: 1 });
-    addStop(grassGrad, '0%',   '#2d5a1b');
-    addStop(grassGrad, '100%', '#1a3a0e');
+    addStop(grassGrad, '0%',   theme.grassTop);
+    addStop(grassGrad, '100%', theme.grassBot);
     rect(svg, 0, soilY - 10, W, 22, 'url(#grassGrad)');
 
     // Grass blades
     for (let i = 0; i < W; i += 8) {
       const bh = 6 + (i * 7 % 10);
       const bx = i + (i % 3);
-      line(svg, bx, soilY - 10, bx - 2, soilY - 10 - bh, '#3a7024', 1.5);
+      line(svg, bx, soilY - 10, bx - 2, soilY - 10 - bh, theme.grassBlade, 1.5);
     }
 
     // ── Soil ─────────────────────────────────────────────────────────────
@@ -356,6 +442,20 @@ const Garden = (() => {
     const g = Math.round(ag + (bg - ag) * t);
     const bv = Math.round(ab + (bb - ab) * t);
     return `rgb(${r},${g},${bv})`;
+  }
+
+  // ── Cloud helper ──────────────────────────────────────────────────────
+  function drawCloud(svg, cx, cy, scale, ns) {
+    const color = 'rgba(255,255,255,0.82)';
+    const bubbles = [
+      { dx: 0,    dy: 0,  r: 16 * scale },
+      { dx: -18 * scale, dy: 6 * scale, r: 12 * scale },
+      { dx:  18 * scale, dy: 6 * scale, r: 12 * scale },
+      { dx: -10 * scale, dy: 10 * scale, r: 14 * scale },
+      { dx:  10 * scale, dy: 10 * scale, r: 14 * scale },
+      { dx:   0,   dy: 12 * scale, r: 16 * scale },
+    ];
+    bubbles.forEach(b => circle(svg, cx + b.dx, cy + b.dy, b.r, color));
   }
 
   // ── Garden status text ─────────────────────────────────────────────────
