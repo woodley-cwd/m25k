@@ -28,7 +28,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   navBtns.forEach(btn => {
-    btn.addEventListener('click', () => showScreen(btn.dataset.screen));
+    btn.addEventListener('click', () => {
+      if (btn.dataset.screen === 'workout') {
+        startNextWorkout();
+      } else {
+        showScreen(btn.dataset.screen);
+      }
+    });
   });
 
   // ── HOME screen ──────────────────────────────────────────────────────────
@@ -183,15 +189,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function saveAndFinish(totalSec, distanceKm) {
     const progress = Storage.getProgress();
-    Garden.onWorkoutComplete(progress.weekIndex);
     const runTime  = Workout.getIntervals()
       .filter(i => i.type === 'run')
       .reduce((s, i) => s + i.duration, 0);
-    // ~1 cal per kg per km; assume 70 kg runner, running fraction only
     const calories = Math.round(distanceKm > 0
       ? distanceKm * 70
-      : (runTime / 3600) * 70 * 8); // rough MET estimate if no GPS
+      : (runTime / 3600) * 70 * 8);
 
+    // Save history FIRST — never let garden errors block this
     Storage.addHistoryRecord({
       weekIndex:   progress.weekIndex,
       dayIndex:    progress.dayIndex,
@@ -203,6 +208,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Storage.advanceProgress();
     MapTracker.reset();
+
+    // Garden update is non-critical — wrapped so errors can't break anything
+    try { Garden.onWorkoutComplete(progress.weekIndex); } catch (e) {}
 
     setTimeout(() => {
       showScreen('home');
