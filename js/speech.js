@@ -19,6 +19,20 @@ const Speech = (() => {
     window.speechSynthesis.onvoiceschanged = pickVoice;
   }
 
+  // Play a silent audio buffer to unlock the media audio channel on iOS/Android
+  // before the first TTS fires — this prevents the voice from playing at low volume.
+  function unlockAudio() {
+    try {
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const buf = ctx.createBuffer(1, 1, 22050);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.start(0);
+      setTimeout(() => ctx.close(), 500);
+    } catch (e) {}
+  }
+
   function speak(text) {
     if (!enabled || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
@@ -33,5 +47,5 @@ const Speech = (() => {
   function setEnabled(val) { enabled = val; }
   function isEnabled() { return enabled; }
 
-  return { init, speak, setEnabled, isEnabled };
+  return { init, speak, unlockAudio, setEnabled, isEnabled };
 })();

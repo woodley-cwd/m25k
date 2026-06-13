@@ -320,11 +320,12 @@ html, body {
 
 .overall-timer {
   text-align: center;
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-muted);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
   padding-bottom: 12px;
   flex-shrink: 0;
+  letter-spacing: 0.5px;
 }
 
 /* Map */

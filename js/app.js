@@ -118,7 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     Workout.onTick = (remaining, totalElapsed) => {
       document.getElementById('workout-phase-timer').textContent = formatTime(remaining);
-      document.getElementById('workout-overall-timer').textContent = formatTime(totalElapsed);
+      document.getElementById('workout-overall-timer').textContent =
+        formatTime(totalElapsed) + ' / ' + formatTime(Workout.getTotalDuration());
       renderIntervalStrip();
     };
 
@@ -126,6 +127,9 @@ document.addEventListener('DOMContentLoaded', () => {
       saveAndFinish(totalSec, distanceKm);
     };
 
+    document.getElementById('workout-overall-timer').textContent =
+      '0:00 / ' + formatTime(Workout.getTotalDuration());
+    Speech.unlockAudio();
     Workout.start();
     updatePauseBtn();
   }

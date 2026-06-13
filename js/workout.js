@@ -119,6 +119,10 @@ const Workout = (() => {
 
   function getTotalElapsed() { return totalElapsed; }
 
+  function getTotalDuration() {
+    return intervals.reduce((s, i) => s + i.duration, 0);
+  }
+
   function getIntervals() { return intervals; }
 
   function notifyPhaseChange() {
@@ -150,7 +154,7 @@ const Workout = (() => {
     load, start, pause, resume, stop,
     isPaused, isFinished,
     getCurrentInterval, getNextInterval,
-    getCurrentRemaining, getTotalElapsed,
+    getCurrentRemaining, getTotalElapsed, getTotalDuration,
     getIntervals, buildStripData, getCurrentIndex,
     set onPhaseChange(fn) { onPhaseChange = fn; },
     set onTick(fn) { onTick = fn; },
